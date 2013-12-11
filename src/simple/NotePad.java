@@ -11,9 +11,16 @@ import java.awt.Font;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
+import java.awt.MenuShortcut;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Scanner;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 /**
@@ -78,10 +85,52 @@ public class NotePad extends JFrame implements ActionListener{
     }
 
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void actionPerformed (ActionEvent e) {
+	// if the source of the event was our "close" option
+	if (e.getSource() == this.close)
+		this.dispose(); // dispose all resources and close the application
+	
+	// if the source was the "open" option
+	else if (e.getSource() == this.openFile) {
+		JFileChooser open = new JFileChooser(); // open up a file chooser (a dialog for the user to browse files to open)
+		int option = open.showOpenDialog(this); // get the option that the user selected (approve or cancel)
+		// NOTE: because we are OPENing a file, we call showOpenDialog~
+		// if the user clicked OK, we have "APPROVE_OPTION"
+		// so we want to open the file
+		if (option == JFileChooser.APPROVE_OPTION) {
+			this.textArea.setText(""); // clear the TextArea before applying the file contents
+			try {
+				// create a scanner to read the file (getSelectedFile().getPath() will get the path to the file)
+				Scanner scan = new Scanner(new FileReader(open.getSelectedFile().getPath()));
+				while (scan.hasNext()) // while there's still something to read
+					this.textArea.append(scan.nextLine() + "\n"); // append the line to the TextArea
+			} catch (Exception ex) { // catch any exceptions, and...
+				// ...write to the debug console
+				System.out.println(ex.getMessage());
+			}
+		}
+	}
+	
+	// and lastly, if the source of the event was the "save" option
+	else if (e.getSource() == this.saveFile) {
+		JFileChooser save = new JFileChooser(); // again, open a file chooser
+		int option = save.showSaveDialog(this); // similar to the open file, only this time we call
+		// showSaveDialog instead of showOpenDialog
+		// if the user clicked OK (and not cancel)
+		if (option == JFileChooser.APPROVE_OPTION) {
+			try {
+				// create a buffered writer to write to a file
+				BufferedWriter out = new BufferedWriter(new FileWriter(save.getSelectedFile().getPath()));
+				out.write(this.textArea.getText()); // write the contents of the TextArea to the file
+				out.close(); // close the file stream
+			} catch (Exception ex) { // again, catch any exceptions and...
+				// ...write to the debug console
+				System.out.println(ex.getMessage());
+			}
+		}
+	}
+}
+
     /*public static void main(String[] args){
         NotePad n1=new NotePad();
     }
