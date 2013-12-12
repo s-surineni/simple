@@ -156,7 +156,7 @@ public class Calendar {
             //Allow/disallow buttons
             btnPrev.setEnabled(true);
             btnNext.setEnabled(true);
-            if (month == 0 && year <= realYear - 10) {
+            if (month == 0 && year <= realYear - 100) {
                 btnPrev.setEnabled(false);
             } //Too early
             if (month == 11 && year >= realYear + 100) {
